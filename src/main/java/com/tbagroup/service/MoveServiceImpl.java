@@ -14,23 +14,26 @@ public class MoveServiceImpl implements MoveService {
     }
 
     @Override
-    public void move(CraneDto crane) {
+    public synchronized void move(CraneDto crane) {
         TaskDto peek = crane.getTasks().peek();
         if (peek != null) {
-            TrackApplication.LOGGER.debug("processing task {}", peek);
-            handleConflict(peek, crane);
+            handler(peek, crane);
             crane.getTasks().poll();
             TrackApplication.LOGGER.info("task {} is done", peek.getId());
         }
     }
 
-    private void handleConflict(TaskDto peek, CraneDto crane) {
+    private void handler(TaskDto peek, CraneDto crane) {
         CraneDto other = track.getOtherCrane(crane);
         if (other != null) {
             TaskDto motion = null;
+            Integer otherPosition   = other.getPosition();
+            Integer currentPosition = crane.getPosition();
             int position = peek.getEndPosition();
             if((peek.getEndPosition() > other.getPosition()
                 && crane.getParkPosition() == 0)){
+                TrackApplication.LOGGER.info("crane {} peek {} position {}"
+                        , crane,peek ,position);
                 if(position == other.getParkPosition() - 1 ){
                     position = other.getParkPosition();
                 }
@@ -41,18 +44,16 @@ public class MoveServiceImpl implements MoveService {
                     position = other.getParkPosition();
                 }
             }
-            motion = new TaskDto("Action-Base",other.getPosition(),position);
-            move(motion,other);
-            move(peek,crane);
+            motion = new TaskDto(other.getId(),"Crane-Move",other.getPosition(),position);
+            TrackApplication.LOGGER.info("crane {} peek {} position {} motion {}"
+                    , crane,peek ,position,motion);
+            doIt(motion,other);
+            doIt(peek,crane);
         }
-        move(peek, crane);
+        doIt(peek, crane);
     }
 
-    private synchronized void moveCrane(CraneDto crane ,Integer endPosition) {
-
-    }
-
-    private synchronized void move(TaskDto poll, CraneDto crane) {
+    private void doIt(TaskDto poll, CraneDto crane) {
         TrackApplication.LOGGER.info("move container {} type {} from {} , to {} "
                 , poll.getId(), poll.getType() ,poll.getStartPosition(), poll.getEndPosition());
         crane.setPosition(poll.getEndPosition());

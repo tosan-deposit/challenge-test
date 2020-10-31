@@ -13,14 +13,14 @@ public class TaskDto implements Comparable<TaskDto> {
 
     public TaskDto(Integer startPosition, Integer endPosition) {
         this.id = UUID.randomUUID();
-        this.type = "Container";
+        this.type = "Container-Move";
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.priority = 0;
     }
 
-    public TaskDto(String type, Integer startPosition, int endPosition) {
-        this.id = UUID.randomUUID();
+    public TaskDto(UUID id,String type, Integer startPosition, int endPosition) {
+        this.id = id;
         this.type = type;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
