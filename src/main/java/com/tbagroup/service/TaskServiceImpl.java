@@ -22,13 +22,20 @@ public class TaskServiceImpl implements TaskService {
         thread.start();
     }
 
-    private static TaskDto createDummyTask(Integer maxLength) {
+    private static TaskDto createDummyTask(Integer parkPosition
+            , Integer maxLength) {
+        TaskDto taskDto = null;
         Random random = new Random();
         int last = random.ints(1, maxLength).findFirst().getAsInt() + 1;
         TrackApplication.LOGGER.debug("last {}", last);
         int first = random.ints(1, last).findFirst().getAsInt();
         TrackApplication.LOGGER.debug("first {}", first);
-        return new TaskDto(first, last);
+        if(parkPosition > maxLength){
+            taskDto = new TaskDto(last ,first);
+        }else {
+            taskDto = new TaskDto(first, last);
+        }
+        return taskDto;
     }
 
     public class TaskProducer implements Runnable {
@@ -42,13 +49,10 @@ public class TaskServiceImpl implements TaskService {
         @Override
         public void run() {
             while (true) {
-                TaskDto dto = TaskServiceImpl.createDummyTask(maxLength);
-                boolean offer = crane.getTasks().offer(dto);
-                TrackApplication.LOGGER.debug("is task {} generated ? {}", dto, offer);
+                TaskDto dto = TaskServiceImpl.createDummyTask(crane.getParkPosition(),maxLength);
+                crane.getTasks().offer(dto);
+                TrackApplication.LOGGER.info("task {} is  generated for crane {}", dto, crane.getId());
                 try {
-//                    wait(60000);
-//                    notify();
-//                    notify();
                     Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -10,9 +10,9 @@ public class TrackServiceImpl implements TrackService {
     private CraneService craneService;
 
     public TrackServiceImpl(Configuration configuration) {
-        TrackApplication.LOGGER.debug("initialize track with all of stuff...");
         this.track = new TrackDto(configuration.getName(), configuration.getLength(), configuration.getCraneCount());
         this.craneService = new CraneServiceImpl(this.track);
+        TrackApplication.LOGGER.info("Track {} initialize...",track.getName());
     }
 
 

@@ -6,19 +6,33 @@ import java.util.UUID;
 public class TaskDto implements Comparable<TaskDto> {
 
     private final UUID id;
+    private final String type;
     private Integer startPosition;
     private Integer endPosition;
     private Integer priority;
 
     public TaskDto(Integer startPosition, Integer endPosition) {
         this.id = UUID.randomUUID();
+        this.type = "Container";
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.priority = 0;
     }
 
+    public TaskDto(String type, Integer startPosition, int endPosition) {
+        this.id = UUID.randomUUID();
+        this.type = type;
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.priority = 5;
+    }
+
     public UUID getId() {
         return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public Integer getStartPosition() {
@@ -67,6 +81,7 @@ public class TaskDto implements Comparable<TaskDto> {
     public String toString() {
         return "TaskDto{" +
                 "id=" + id +
+                ", type='" + type + '\'' +
                 ", startPosition=" + startPosition +
                 ", endPosition=" + endPosition +
                 ", priority=" + priority +

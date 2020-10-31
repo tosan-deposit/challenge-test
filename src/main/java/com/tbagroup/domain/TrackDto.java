@@ -51,6 +51,15 @@ public class TrackDto {
         getRelatedCranes().add(crane);
     }
 
+    public CraneDto getOtherCrane(CraneDto crane) {
+        CraneDto other = null;
+        for(CraneDto dto : getRelatedCranes()){
+            if(!dto.equals(crane))
+                other = dto;
+        }
+        return other;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,6 +80,7 @@ public class TrackDto {
                 ", length=" + length +
                 ", rightParking=" + rightParking +
                 ", leftParking=" + leftParking +
+                ", craneCount=" + craneCount +
                 '}';
     }
 }

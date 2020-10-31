@@ -8,6 +8,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class CraneDto {
     private final UUID id;
     private Boolean inPark;
+    private final Integer parkPosition;
     private Integer position;
     private BlockingQueue<TaskDto> tasks = new PriorityBlockingQueue<>();
 
@@ -15,6 +16,7 @@ public class CraneDto {
         this.id = UUID.randomUUID();
         this.inPark = true;
         this.position = position;
+        this.parkPosition = position;
     }
 
     public UUID getId() {
@@ -34,7 +36,15 @@ public class CraneDto {
     }
 
     public void setPosition(Integer position) {
+        if(position == parkPosition)
+            inPark = true;
+        else
+            inPark = false;
         this.position = position;
+    }
+
+    public Integer getParkPosition() {
+        return parkPosition;
     }
 
     public BlockingQueue<TaskDto> getTasks() {
@@ -65,6 +75,7 @@ public class CraneDto {
         return "CraneDto{" +
                 "id=" + id +
                 ", inPark=" + inPark +
+                ", parkPosition=" + parkPosition +
                 ", position=" + position +
                 '}';
     }

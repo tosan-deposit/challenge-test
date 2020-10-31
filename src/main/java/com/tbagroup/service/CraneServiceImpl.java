@@ -2,7 +2,6 @@ package com.tbagroup.service;
 
 import com.tbagroup.TrackApplication;
 import com.tbagroup.domain.CraneDto;
-import com.tbagroup.domain.TaskDto;
 import com.tbagroup.domain.TrackDto;
 
 import java.util.concurrent.ExecutorService;
@@ -14,11 +13,12 @@ public class CraneServiceImpl implements CraneService {
     private TaskService taskService;
     private TrackDto track;
     private ExecutorService executor;
+    private MoveService moveService;
 
     public CraneServiceImpl(TrackDto track) {
-        TrackApplication.LOGGER.debug("initialize crane with all of stuff...");
         this.track = track;
         this.taskService = new TaskServiceImpl(track.getLength());
+        this.moveService = new MoveServiceImpl(track);
     }
 
     @Override
@@ -27,26 +27,35 @@ public class CraneServiceImpl implements CraneService {
     }
 
     @Override
+    public void setMoveService(MoveService moveService) {
+        this.moveService = moveService;
+    }
+
+    @Override
     public void startWork() {
         setupCranes();
         executor = Executors.newFixedThreadPool(track.getCraneCount());
-        for(CraneDto dto : track.getRelatedCranes()){
-            executor.execute(new CraneMovement(dto,track));
+        for (CraneDto dto : track.getRelatedCranes()) {
+            executor.execute(new CraneMovement(dto, track));
         }
     }
 
     @Override
     public void stopWork() {
-        if(executor != null && !executor.isShutdown())
+        if (executor != null && !executor.isShutdown())
             executor.shutdownNow();
     }
 
     private void setupCranes() {
-        for(int i = 0 ; i < track.getCraneCount() ; i++){
-            CraneDto crane = new CraneDto(track.getLeftParking());
+        int park = track.getLeftParking();
+        for (int i = 0; i < track.getCraneCount(); i++) {
+            CraneDto crane = new CraneDto(park);
             crane.addTasks(new PriorityBlockingQueue<>());
             track.addCrane(crane);
             taskService.produceTask(crane);
+            TrackApplication.LOGGER.info("crane {} initialize in parking {}..."
+                    , crane.getId(), crane.getPosition());
+            park = track.getRightParking();
         }
     }
 
@@ -63,16 +72,8 @@ public class CraneServiceImpl implements CraneService {
         @Override
         public void run() {
             while (true) {
-                TaskDto poll = crane.getTasks().poll();
-                if(poll != null) {
-                    TrackApplication.LOGGER.debug("processing task {}", poll);
-                    move(poll);
-                }
+                moveService.move(crane);
             }
-        }
-
-        private void move(TaskDto poll) {
-//            if()
         }
 
     }
