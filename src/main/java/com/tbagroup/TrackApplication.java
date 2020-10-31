@@ -24,13 +24,6 @@ public class TrackApplication {
         TrackService trackService = new TrackServiceImpl(configuration);
         trackService.startWork();
         Thread.currentThread().join();
-
-//        try {
-//            Thread.currentThread().wait();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//            trackService.stopWork();
-//        }
     }
 
     private static Configuration getConfiguration(String[] args)  throws ParseException{

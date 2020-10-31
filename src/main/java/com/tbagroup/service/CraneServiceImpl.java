@@ -61,8 +61,8 @@ public class CraneServiceImpl implements CraneService {
 
     public class CraneMovement implements Runnable {
 
-        private TrackDto track;
-        private CraneDto crane;
+        private volatile TrackDto track;
+        private volatile CraneDto crane;
 
         public CraneMovement(CraneDto crane, TrackDto track) {
             this.crane = crane;

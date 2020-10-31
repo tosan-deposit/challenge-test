@@ -27,9 +27,7 @@ public class TaskServiceImpl implements TaskService {
         TaskDto taskDto = null;
         Random random = new Random();
         int last = random.ints(1, maxLength).findFirst().getAsInt() + 1;
-        TrackApplication.LOGGER.debug("last {}", last);
         int first = random.ints(1, last).findFirst().getAsInt();
-        TrackApplication.LOGGER.debug("first {}", first);
         if(parkPosition > maxLength){
             taskDto = new TaskDto(last ,first);
         }else {
